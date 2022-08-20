@@ -4,7 +4,7 @@ The GPS module in mifsa.
 
 ## Requirements:
 
-- mifsa_base
+- [mifsa-base](https://github.com/lujuntuan/mifsa-base)
 
 One of the following rpc communication libraries is required: 
 
