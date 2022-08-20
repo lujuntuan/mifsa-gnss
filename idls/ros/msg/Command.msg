@@ -1,0 +1,3 @@
+uint8 START_NAVIGATION = 1
+uint8 STOP_NAVIGATION = 2
+uint8 type

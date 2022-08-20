@@ -1,0 +1,10 @@
+uint32 size
+uint32 flags
+float32 latitude
+float32 longitude
+float32 altitude
+float32 speed
+float32 bearing
+float32 accuracy
+uint64 timestamp
+string data

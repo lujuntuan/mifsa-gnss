@@ -1,0 +1,34 @@
+package commonapi.mifsa.gnss
+
+interface interfaces {
+    version { major 1 minor 0 }
+    method startNavigation fireAndForget {
+    }
+    method stopNavigation fireAndForget {
+    }
+    method getNmea {
+        out {
+            Nmea nmea
+        }
+    }
+    broadcast reportLocation {
+        out {
+            Location location
+        }
+    }
+    struct Location {
+        Int64 size
+        Int32 flags
+        Double latitude
+        Double longitude
+        Double altitude
+        Float  speed
+        Float  bearing
+        Float  accuracy
+        Int64 timestamp
+        String data
+    }
+    struct Nmea {
+        String data
+    }
+}

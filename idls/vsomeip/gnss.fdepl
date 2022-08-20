@@ -1,0 +1,38 @@
+import "platform:/plugin/org.genivi.commonapi.someip/deployment/CommonAPI-SOMEIP_deployment_spec.fdepl"
+import "gnss.fidl"
+
+define org.genivi.commonapi.someip.deployment for interface commonapi.mifsa.gnss.interfaces {
+    SomeIpServiceID = 12201
+    method startNavigation {
+        SomeIpMethodID = 12510
+        SomeIpReliable = true
+        in {
+        }
+    }
+    method stopNavigation {
+        SomeIpMethodID = 12511
+        SomeIpReliable = true
+        in {
+        }
+    }
+    method getNmea {
+        SomeIpMethodID = 12512
+        SomeIpReliable = true
+        out {
+        }
+    }
+    broadcast reportLocation {
+        SomeIpEventID = 12620
+        SomeIpReliable = true
+        SomeIpEventGroups = { 12620 }
+        out {
+        }
+    }
+}
+
+define org.genivi.commonapi.someip.deployment for provider as Service {
+    instance commonapi.mifsa.gnss.interfaces {
+        InstanceId = "commonapi.mifsa.gnss.interfaces"
+        SomeIpInstanceID = 12101
+    }
+}

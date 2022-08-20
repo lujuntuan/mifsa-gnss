@@ -1,0 +1,34 @@
+syntax = "proto3";
+package mifsa.gnss.pb;
+
+enum MsgID {
+    MSG_UNKNOWN = 0;
+    MSG_COMMAND = 1;
+    MSG_LOCATION = 2;
+}
+
+message Command{
+    enum Type {
+        QUERY_NMEA = 0;
+        START_NAVIGATION = 1;
+        STOP_NAVIGATION = 2;
+    }
+    Type type = 1;
+}
+
+message Location{
+    int64 size = 1;
+    int32 flags = 2;
+    double latitude = 3;
+    double longitude = 4;
+    double altitude = 5;
+    float  speed = 6;
+    float  bearing = 7;
+    float  accuracy = 8;
+    int64 timestamp = 9;
+    string data = 10;
+}
+
+message Nmea{
+    string data = 1;
+}
