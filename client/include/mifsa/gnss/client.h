@@ -21,14 +21,14 @@
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-
 class MIFSA_EXPORT Client : public ClientProxy<Interface>, public SingletonProxy<Client> {
-
 public:
     Client(int argc, char** argv);
     ~Client();
-};
 
+private:
+    friend class InterfaceImplementation;
+};
 }
 
 MIFSA_NAMESPACE_END

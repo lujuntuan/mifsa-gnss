@@ -11,10 +11,10 @@
  **********************************************************************************/
 
 #include "server.h"
+#include "adpter/provider_fdbus.hpp"
+#include "adpter/provider_ros.hpp"
+#include "adpter/provider_vsomeip.hpp"
 #include "parser/minmea.h"
-#include "provider_fdbus.hpp"
-#include "provider_ros.hpp"
-#include "provider_vsomeip.hpp"
 #include <sstream>
 
 int main(int argc, char* argv[])
@@ -52,12 +52,12 @@ private:
 
 namespace Gnss {
 
+const Application::Arg _arg_version("v", "version", " module version");
 Server::Server(int argc, char** argv)
     : ServerProxy(argc, argv, "gnss")
 {
     setInstance(this);
     //
-    const Application::Arg _arg_version("v", "version", " module version");
     parserArgs({ _arg_version });
     if (getArgValue(_arg_version).toBool()) {
         LOG_DEBUG(MIFSA_GNSS_VERSION);

@@ -22,7 +22,6 @@
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-
 class Server : public ServerProxy<Provider>, public PlatformProxy<Platform>, public SingletonProxy<Server> {
 
 public:
@@ -36,9 +35,9 @@ protected:
     virtual void eventChanged(const std::shared_ptr<Event>& event) override;
 
 private:
+    friend class ProviderImplementation;
     Location m_location;
 };
-
 }
 
 MIFSA_NAMESPACE_END

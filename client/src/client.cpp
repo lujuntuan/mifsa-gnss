@@ -11,9 +11,9 @@
  **********************************************************************************/
 
 #include "mifsa/gnss/client.h"
-#include "interface_fdbus.hpp"
-#include "interface_ros.hpp"
-#include "interface_vsomeip.hpp"
+#include "adpter/interface_fdbus.hpp"
+#include "adpter/interface_ros.hpp"
+#include "adpter/interface_vsomeip.hpp"
 
 MIFSA_NAMESPACE_BEGIN
 
