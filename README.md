@@ -1,6 +1,6 @@
 # MIFSA-GNSS
 
-The GPS module in mifsa.
+The GPS module in [mifsa](https://github.com/lujuntuan/mifsa).
 
 ## Requirements:
 
