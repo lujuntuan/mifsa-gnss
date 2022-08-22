@@ -14,15 +14,15 @@
 #define MIFSA_GNSS_SERVER_H
 
 #include "mifsa/gnss/config.h"
-#include "mifsa/gnss/platform.h"
-#include "mifsa/gnss/provider.h"
+#include "mifsa/gnss/platform_interface.h"
+#include "mifsa/gnss/server_interface.h"
 #include <mifsa/base/singleton.h>
 #include <mifsa/module/server.hpp>
 
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-class Server : public ServerProxy<Provider>, public PlatformProxy<Platform>, public SingletonProxy<Server> {
+class Server : public ServerProxy<ServerInterface>, public PlatformProxy<PlatformInterface>, public SingletonProxy<Server> {
 
 public:
     Server(int argc, char** argv);
@@ -35,7 +35,7 @@ protected:
     virtual void eventChanged(const std::shared_ptr<Event>& event) override;
 
 private:
-    friend class ProviderImplementation;
+    friend class ServertInterfaceAdapter;
     Location m_location;
 };
 }
@@ -43,7 +43,5 @@ private:
 MIFSA_NAMESPACE_END
 
 #define mifsa_gnss_server Mifsa::Gnss::Server::getInstance()
-#define mifsa_gnss_provider mifsa_gnss_server->provider()
-#define mifsa_gnss_platform mifsa_gnss_server->platform()
 
 #endif // MIFSA_GNSS_SERVER_H

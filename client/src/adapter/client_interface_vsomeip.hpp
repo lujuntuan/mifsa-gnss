@@ -10,12 +10,12 @@
  *History:
  **********************************************************************************/
 
+#ifndef MIFSA_GNSS_CLIENT_INTERFACE_VSOMEIP_H
+#define MIFSA_GNSS_CLIENT_INTERFACE_VSOMEIP_H
+
 #ifdef MIFSA_SUPPORT_VSOMEIP
 
-#ifndef MIFSA_GNSS_INTERFACE_REALIZE_H
-#define MIFSA_GNSS_INTERFACE_REALIZE_H
-
-#include "mifsa/gnss/interface.h"
+#include "mifsa/gnss/client_interface.h"
 #include <CommonAPI/CommonAPI.hpp>
 #include <mifsa/utils/dir.h>
 #include <mifsa/utils/host.h>
@@ -29,9 +29,9 @@ CommonAPI::CallInfo _callInfo(5000);
 
 namespace Gnss {
 
-class InterfaceImplementation : public Interface {
+class ClientInterfaceAdapter : public ClientInterface {
 public:
-    InterfaceImplementation()
+    ClientInterfaceAdapter()
     {
         std::string vsomeipApiCfg = Utils::getCfgPath("vsomeip_mifsa_gnss_client.json", "VSOMEIP_CONFIGURATION", "mifsa");
         if (!vsomeipApiCfg.empty()) {
@@ -64,8 +64,10 @@ public:
         {
         }
     }
-    ~InterfaceImplementation()
+    ~ClientInterfaceAdapter()
     {
+        m_commonApiProxy.reset();
+        CommonAPI::Runtime::get().reset();
     }
     virtual std::string version() override
     {
@@ -114,4 +116,4 @@ MIFSA_NAMESPACE_END
 
 #endif
 
-#endif // MIFSA_GNSS_INTERFACE_REALIZE_H
+#endif // MIFSA_GNSS_CLIENT_INTERFACE_VSOMEIP_H

@@ -13,27 +13,30 @@
 #ifndef MIFSA_GNSS_CLIENT_H
 #define MIFSA_GNSS_CLIENT_H
 
+#include "mifsa/gnss/client_interface.h"
 #include "mifsa/gnss/config.h"
-#include "mifsa/gnss/interface.h"
 #include <mifsa/base/singleton.h>
 #include <mifsa/module/client.hpp>
 
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-class MIFSA_EXPORT Client : public ClientProxy<Interface>, public SingletonProxy<Client> {
+class MIFSA_EXPORT Client : public ClientProxy<ClientInterface>, public SingletonProxy<Client> {
 public:
     Client(int argc, char** argv);
     ~Client();
+    virtual std::string getNmea();
+    virtual void startNavigation(const ClientInterface::CbLocation& cb);
+    virtual void stopNavigation();
 
 private:
-    friend class InterfaceImplementation;
+    friend class ClientInterfaceAdapter;
+    Semaphore m_sema;
 };
 }
 
 MIFSA_NAMESPACE_END
 
 #define mifsa_gnss_client Mifsa::Gnss::Client::getInstance()
-#define mifsa_gnss_interface mifsa_gnss_client->interface()
 
 #endif // MIFSA_GNSS_CLIENT_H

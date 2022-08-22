@@ -17,11 +17,11 @@ using namespace Mifsa;
 int main(int argc, char* argv[])
 {
     Gnss::Client client(argc, argv);
-    client.interface()->detectConnect([&](bool connect) {
+    client.detectConnect([&](bool connect) {
         if (connect) {
-            client.interface()->startNavigation([&](const Gnss::Location& location) {
+            client.startNavigation([&](const Gnss::Location& location) {
                 LOG_DEBUG("***** print Gnss::Location");
-                const std::string& nmea = client.interface()->getNmea();
+                const std::string& nmea = client.getNmea();
                 LOG_PROPERTY("nmea", nmea);
                 LOG_PROPERTY("size", location.size);
                 LOG_PROPERTY("flags", location.flags);
@@ -38,6 +38,6 @@ int main(int argc, char* argv[])
         }
     });
     int reval = client.exec();
-    client.interface()->stopNavigation();
+    client.stopNavigation();
     return reval;
 }

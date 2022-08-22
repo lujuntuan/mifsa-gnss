@@ -11,9 +11,9 @@
  **********************************************************************************/
 
 #include "mifsa/gnss/client.h"
-#include "adpter/interface_fdbus.hpp"
-#include "adpter/interface_ros.hpp"
-#include "adpter/interface_vsomeip.hpp"
+#include "adapter/client_interface_fdbus.hpp"
+#include "adapter/client_interface_ros.hpp"
+#include "adapter/client_interface_vsomeip.hpp"
 
 MIFSA_NAMESPACE_BEGIN
 
@@ -24,12 +24,27 @@ Client::Client(int argc, char** argv)
 {
     setInstance(this);
     //
-    loadInterface<InterfaceImplementation>();
+    loadInterface<ClientInterfaceAdapter>();
 }
 
 Client::~Client()
 {
     setInstance(nullptr);
+}
+
+std::string Client::getNmea()
+{
+    return interface()->getNmea();
+}
+
+void Client::startNavigation(const ClientInterface::CbLocation& cb)
+{
+    interface()->startNavigation(cb);
+}
+
+void Client::stopNavigation()
+{
+    interface()->stopNavigation();
 }
 
 }

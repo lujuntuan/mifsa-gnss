@@ -13,14 +13,17 @@
 #ifndef MIFSA_GNSS_PROVIDER_H
 #define MIFSA_GNSS_PROVIDER_H
 
-#include "types.h"
-#include <mifsa/module/provider.hpp>
+#include "common_types.h"
+#include <mifsa/module/server.hpp>
 
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-class Provider : public ProviderBase {
+class ServerInterface : public ServerInterfaceBase {
 public:
+    using CbNmea = std::function<void(std::string&)>;
+    using CbStartNavigation = std::function<void()>;
+    using CbStopNavigation = std::function<void()>;
     virtual void setCbNmea(const CbNmea& cb) = 0;
     virtual void reportGnss(const Location& location) = 0;
     virtual void setCbStartNavigation(const CbStartNavigation& cb) = 0;
