@@ -27,7 +27,7 @@ int mifsa_gnss_init(mifsa_gnss_cb_tables_t cbs)
     _cb_tables = cbs;
     _gnss_client = std::make_shared<Client>(0, nullptr);
     _gnss_client->setInstance(_gnss_client.get());
-    _gnss_client->interface()->detectConnect([](bool connected) {
+    _gnss_client->detectConnect([](bool connected) {
         if (_cb_tables.connected_cb) {
             _cb_tables.connected_cb(connected);
         }
@@ -51,7 +51,7 @@ int mifsa_gnss_waitfor_server(int timeout_ms)
     if (!_gnss_client) {
         return 1;
     }
-    bool ok = _gnss_client->interface()->waitForConnected(timeout_ms);
+    bool ok = _gnss_client->waitForConnected(timeout_ms);
     if (ok) {
         return 0;
     } else {
@@ -64,7 +64,7 @@ int mifsa_gnss_get_nmea_data(char** nmea, int* size)
     if (!nmea || !size) {
         return 2;
     }
-    std::string data = _gnss_client->interface()->getNmea().c_str();
+    std::string data = _gnss_client->getNmea().c_str();
     memcpy(*nmea, data.c_str(), data.size());
     *size = (int)data.size();
     return 0;
@@ -75,7 +75,7 @@ int mifsa_gnss_start_navigation()
     if (!_gnss_client) {
         return 1;
     }
-    mifsa_gnss_interface->startNavigation([&](const Location& location) {
+    _gnss_client->startNavigation([&](const Location& location) {
         if (_cb_tables.location_cb) {
             mifsa_gnss_location_t c_location;
             c_location.size = location.size;
@@ -100,6 +100,6 @@ int mifsa_gnss_stop_navigation()
     if (!_gnss_client) {
         return 1;
     }
-    _gnss_client->interface()->stopNavigation();
+    _gnss_client->stopNavigation();
     return 0;
 }

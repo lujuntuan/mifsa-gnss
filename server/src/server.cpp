@@ -11,9 +11,9 @@
  **********************************************************************************/
 
 #include "server.h"
-#include "adpter/provider_fdbus.hpp"
-#include "adpter/provider_ros.hpp"
-#include "adpter/provider_vsomeip.hpp"
+#include "adapter/server_interface_fdbus.hpp"
+#include "adapter/server_interface_ros.hpp"
+#include "adapter/server_interface_vsomeip.hpp"
 #include "parser/minmea.h"
 #include <sstream>
 
@@ -65,21 +65,21 @@ Server::Server(int argc, char** argv)
     }
     //
     loadPlatform(module());
-    loadProvider<ProviderImplementation>();
+    loadInterface<ServertInterfaceAdapter>();
     std::weak_ptr<Timer> timer = createTimer(100, true, [this]() {
         reportGnss();
         // test
         // VariantMap data1 = { { "name", "tuan" }, { "arg", "18" } };
         // postEvent(std::make_shared<EventDemo>(EventDemo::DEMO_1, data1));
     });
-    provider()->setCbNmea([this](std::string& nmea) {
+    interface()->setCbNmea([this](std::string& nmea) {
         nmea = platform()->getNmea();
     });
-    provider()->setCbStartNavigation([this, timer]() {
+    interface()->setCbStartNavigation([this, timer]() {
         reportGnss();
         timer.lock()->start();
     });
-    provider()->setCbStopNavigation([timer]() {
+    interface()->setCbStopNavigation([timer]() {
         timer.lock()->stop();
     });
 }
@@ -97,7 +97,7 @@ void Server::reportGnss()
     data.resize(1024);
     data.append("data");
     m_location.data = data;
-    provider()->reportGnss(m_location);
+    interface()->reportGnss(m_location);
 }
 
 void Server::parserNmea(const std::string& nmea, Location& location)

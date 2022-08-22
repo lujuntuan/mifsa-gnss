@@ -18,7 +18,7 @@
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-class Platform : public PlatformBase {
+class PlatformInterface : public PlatformInterfaceBase {
     MIFSA_PLUGIN_REGISTER("mifsa_gnss_platform")
 public:
     virtual std::string getNmea() = 0;

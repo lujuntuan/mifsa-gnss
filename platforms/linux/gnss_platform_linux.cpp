@@ -10,12 +10,12 @@
  *History:
  **********************************************************************************/
 
-#include <mifsa/gnss/platform.h>
+#include <mifsa/gnss/platform_interface.h>
 
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-class PlatformLinux : public Platform {
+class PlatformInterfaceLinux : public PlatformInterface {
 public:
     virtual std::string getNmea() override
     {
@@ -23,7 +23,7 @@ public:
     }
 };
 
-MIFSA_CREATE_PLATFORM(PlatformLinux, 1, 0);
+MIFSA_CREATE_PLATFORM(PlatformInterfaceLinux, 1, 0);
 }
 
 MIFSA_NAMESPACE_END

@@ -10,7 +10,7 @@
  *History:
  **********************************************************************************/
 
-#include <mifsa/gnss/platform.h>
+#include <mifsa/gnss/platform_interface.h>
 
 MIFSA_NAMESPACE_BEGIN
 
@@ -48,7 +48,7 @@ std::vector<std::string> _test_sentences = {
 int _index = 0;
 
 namespace Gnss {
-class PlatformUnix : public Platform {
+class PlatformInterfaceUnix : public PlatformInterface {
 public:
     virtual std::string getNmea() override
     {
@@ -61,7 +61,7 @@ public:
     }
 };
 
-MIFSA_CREATE_PLATFORM(PlatformUnix, 1, 0);
+MIFSA_CREATE_PLATFORM(PlatformInterfaceUnix, 1, 0);
 }
 
 MIFSA_NAMESPACE_END

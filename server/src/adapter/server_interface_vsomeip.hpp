@@ -10,12 +10,12 @@
  *History:
  **********************************************************************************/
 
-#ifndef MIFSA_GNSS_PROVIDER_REALIZE_VSOMEIP_H
-#define MIFSA_GNSS_PROVIDER_REALIZE_VSOMEIP_H
+#ifndef MIFSA_GNSS_SERVER_INTERFACE_VSOMEIP_H
+#define MIFSA_GNSS_SERVER_INTERFACE_VSOMEIP_H
 
 #ifdef MIFSA_SUPPORT_VSOMEIP
 
-#include "mifsa/gnss/provider.h"
+#include "mifsa/gnss/server_interface.h"
 #include <CommonAPI/CommonAPI.hpp>
 #include <mifsa/utils/dir.h>
 #include <mifsa/utils/host.h>
@@ -26,54 +26,24 @@ using namespace v1_0::commonapi::mifsa::gnss;
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-
-class interfacesImpl : public interfacesStubDefault {
+class ServertInterfaceAdapter : public ServerInterface, protected interfacesStubDefault {
 public:
-    using interfacesStubDefault::interfacesStubDefault;
-    virtual void startNavigation(const std::shared_ptr<CommonAPI::ClientId> _client) override
-    {
-        if (cbStartNavigation) {
-            cbStartNavigation();
-        }
-    }
-    virtual void stopNavigation(const std::shared_ptr<CommonAPI::ClientId> _client) override
-    {
-        if (cbStopNavigation) {
-            cbStopNavigation();
-        }
-    }
-    virtual void getNmea(const std::shared_ptr<CommonAPI::ClientId> _client, getNmeaReply_t _reply) override
-    {
-        std::string nmea;
-        if (cbNmea) {
-            cbNmea(nmea);
-        }
-        _reply(nmea);
-    }
-
-public:
-    CbNmea cbNmea;
-    CbStartNavigation cbStartNavigation;
-    CbStopNavigation cbStopNavigation;
-};
-
-class ProviderImplementation : public Provider {
-public:
-    ProviderImplementation()
+    ServertInterfaceAdapter()
     {
         std::string vsomeipApiCfg = Utils::getCfgPath("vsomeip_mifsa_gnss_server.json", "VSOMEIP_CONFIGURATION", "mifsa");
         if (!vsomeipApiCfg.empty()) {
             Utils::setEnvironment("VSOMEIP_CONFIGURATION", vsomeipApiCfg);
         }
-        m_commonApiStub = std::make_shared<interfacesImpl>();
-        CommonAPI::Runtime::get()->registerService("local", "commonapi.mifsa.gnss.interfaces", m_commonApiStub, "mifsa_gnss_server");
+        std::shared_ptr<interfacesStubDefault> ptr = std::shared_ptr<interfacesStubDefault>((interfacesStubDefault*)this);
+        CommonAPI::Runtime::get()->registerService("local", "commonapi.mifsa.gnss.interfaces", ptr, "mifsa_gnss_server");
     }
-    ~ProviderImplementation()
+    ~ServertInterfaceAdapter()
     {
+        CommonAPI::Runtime::get().reset();
     }
     virtual void setCbNmea(const CbNmea& cb) override
     {
-        m_commonApiStub->cbNmea = cb;
+        m_cbNmea = cb;
     }
     virtual void reportGnss(const Location& location) override
     {
@@ -88,19 +58,43 @@ public:
         capi_location.setAccuracy(location.accuracy);
         capi_location.setTimestamp(location.timestamp);
         capi_location.setData(location.data);
-        m_commonApiStub->fireReportLocationEvent(capi_location);
+        interfacesStubDefault::fireReportLocationEvent(capi_location);
     }
     virtual void setCbStartNavigation(const CbStartNavigation& cb) override
     {
-        m_commonApiStub->cbStartNavigation = cb;
+        m_cbStartNavigation = cb;
     }
     virtual void setCbStopNavigation(const CbStopNavigation& cb) override
     {
-        m_commonApiStub->cbStopNavigation = cb;
+        m_cbStopNavigation = cb;
+    }
+
+protected:
+    virtual void startNavigation(const std::shared_ptr<CommonAPI::ClientId> _client) override
+    {
+        if (m_cbStartNavigation) {
+            m_cbStartNavigation();
+        }
+    }
+    virtual void stopNavigation(const std::shared_ptr<CommonAPI::ClientId> _client) override
+    {
+        if (m_cbStopNavigation) {
+            m_cbStopNavigation();
+        }
+    }
+    virtual void getNmea(const std::shared_ptr<CommonAPI::ClientId> _client, getNmeaReply_t _reply) override
+    {
+        std::string nmea;
+        if (m_cbNmea) {
+            m_cbNmea(nmea);
+        }
+        _reply(nmea);
     }
 
 private:
-    std::shared_ptr<interfacesImpl> m_commonApiStub;
+    ServerInterface::CbNmea m_cbNmea;
+    ServerInterface::CbStartNavigation m_cbStartNavigation;
+    ServerInterface::CbStopNavigation m_cbStopNavigation;
 };
 
 }
@@ -109,4 +103,4 @@ MIFSA_NAMESPACE_END
 
 #endif
 
-#endif // MIFSA_GNSS_PROVIDER_REALIZE_VSOMEIP_H
+#endif // MIFSA_GNSS_SERVER_INTERFACE_VSOMEIP_H

@@ -10,18 +10,18 @@
  *History:
  **********************************************************************************/
 
-#ifndef MIFSA_GNSS_INTERFACE_H
-#define MIFSA_GNSS_INTERFACE_H
+#ifndef MIFSA_GNSS_CIENT_INTERFACE_H
+#define MIFSA_GNSS_CIENT_INTERFACE_H
 
-#include "types.h"
-#include <mifsa/module/interface.hpp>
+#include "common_types.h"
+#include <mifsa/module/client.hpp>
 
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-class Interface : public InterfaceBase {
-
+class ClientInterface : public ClientInterfaceBase {
 public:
+    using CbLocation = std::function<void(const Location&)>;
     virtual std::string getNmea() = 0;
     virtual void startNavigation(const CbLocation& cb) = 0;
     virtual void stopNavigation() = 0;
@@ -30,4 +30,4 @@ public:
 
 MIFSA_NAMESPACE_END
 
-#endif // MIFSA_GNSS_INTERFACE_H
+#endif // MIFSA_GNSS_CIENT_INTERFACE_H

@@ -10,18 +10,18 @@
  *History:
  **********************************************************************************/
 
-#ifndef MIFSA_GNSS_PROVIDER_REALIZE_ROS_H
-#define MIFSA_GNSS_PROVIDER_REALIZE_ROS_H
+#ifndef MIFSA_GNSS_SERVER_INTERFACE_ROS_H
+#define MIFSA_GNSS_SERVER_INTERFACE_ROS_H
 
 #ifdef MIFSA_SUPPORT_ROS
 
-#include "mifsa/gnss/provider.h"
-#include <rclcpp/rclcpp.hpp>
+#include "mifsa/gnss/server_interface.h"
 #include <mifsa/base/semaphore.h>
 #include <mifsa/base/thread.h>
 #include <mifsa_gnss_idl/msg/command.hpp>
 #include <mifsa_gnss_idl/msg/location.hpp>
 #include <mifsa_gnss_idl/srv/nmea.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 using namespace mifsa_gnss_idl;
 
@@ -29,9 +29,9 @@ MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
 
-class ProviderImplementation : public Provider {
+class ServertInterfaceAdapter : public ServerInterface {
 public:
-    ProviderImplementation()
+    ServertInterfaceAdapter()
     {
         Semaphore sema;
         m_thread.start([&]() {
@@ -71,7 +71,7 @@ public:
         });
         sema.acquire();
     }
-    ~ProviderImplementation()
+    ~ServertInterfaceAdapter()
     {
         rclcpp::shutdown();
         m_thread.stop();
@@ -123,4 +123,4 @@ MIFSA_NAMESPACE_END
 
 #endif
 
-#endif // MIFSA_GNSS_PROVIDER_REALIZE_ROS_H
+#endif // MIFSA_GNSS_SERVER_INTERFACE_ROS_H
