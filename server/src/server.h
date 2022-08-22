@@ -35,8 +35,8 @@ protected:
     virtual void eventChanged(const std::shared_ptr<Event>& event) override;
 
 private:
+    struct ServerHelper* m_serverHelper = nullptr;
     friend class ServertInterfaceAdapter;
-    Location m_location;
 };
 }
 

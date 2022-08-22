@@ -13,8 +13,6 @@
 #ifndef MIFSA_GNSS_CLIENT_INTERFACE_VSOMEIP_H
 #define MIFSA_GNSS_CLIENT_INTERFACE_VSOMEIP_H
 
-#ifdef MIFSA_SUPPORT_VSOMEIP
-
 #include "mifsa/gnss/client_interface.h"
 #include <CommonAPI/CommonAPI.hpp>
 #include <mifsa/utils/dir.h>
@@ -40,9 +38,9 @@ public:
         m_commonApiProxy = CommonAPI::Runtime::get()->buildProxy<interfacesProxy>("local", "commonapi.mifsa.gnss.interfaces", "mifsa_gnss_client");
         m_commonApiProxy->getProxyStatusEvent().subscribe([this](const CommonAPI::AvailabilityStatus& status) {
             if (status == CommonAPI::AvailabilityStatus::AVAILABLE) {
-                _cbConnected(true);
+                cbConnected(true);
             } else {
-                _cbConnected(false);
+                cbConnected(false);
             }
         });
         m_commonApiProxy->getReportLocationEvent().subscribe([this](const interfaces::Location& capi_location) {
@@ -113,7 +111,5 @@ private:
 }
 
 MIFSA_NAMESPACE_END
-
-#endif
 
 #endif // MIFSA_GNSS_CLIENT_INTERFACE_VSOMEIP_H

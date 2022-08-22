@@ -19,9 +19,9 @@ int main(int argc, char* argv[])
     Gnss::Client client(argc, argv);
     client.detectConnect([&](bool connect) {
         if (connect) {
-            client.startNavigation([&](const Gnss::Location& location) {
+            client.interface()->startNavigation([&](const Gnss::Location& location) {
                 LOG_DEBUG("***** print Gnss::Location");
-                const std::string& nmea = client.getNmea();
+                const std::string& nmea = client.interface()->getNmea();
                 LOG_PROPERTY("nmea", nmea);
                 LOG_PROPERTY("size", location.size);
                 LOG_PROPERTY("flags", location.flags);
@@ -38,6 +38,6 @@ int main(int argc, char* argv[])
         }
     });
     int reval = client.exec();
-    client.stopNavigation();
+    client.interface()->stopNavigation();
     return reval;
 }

@@ -13,8 +13,6 @@
 #ifndef MIFSA_GNSS_CLIENT_INTERFACE_FDBUS_H
 #define MIFSA_GNSS_CLIENT_INTERFACE_FDBUS_H
 
-#ifdef MIFSA_SUPPORT_FDBUS
-
 #ifdef WIN32
 #ifndef __WIN32__
 #define __WIN32__
@@ -105,11 +103,11 @@ protected:
         CFdbMsgSubscribeList subList;
         CBaseClient::addNotifyItem(subList, mifsa::gnss::pb::MSG_LOCATION);
         CBaseClient::subscribe(subList);
-        _cbConnected(true);
+        cbConnected(true);
     }
     void onOffline(FDBUS_ONLINE_ARG_TYPE) override
     {
-        _cbConnected(false);
+        cbConnected(false);
     }
     void onBroadcast(CBaseJob::Ptr& msg_ref) override
     {
@@ -148,7 +146,5 @@ private:
 }
 
 MIFSA_NAMESPACE_END
-
-#endif
 
 #endif // MIFSA_GNSS_CLIENT_INTERFACE_FDBUS_H

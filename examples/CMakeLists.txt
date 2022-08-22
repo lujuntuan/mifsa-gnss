@@ -12,38 +12,9 @@
 
 project(examples)
 
-add_executable(
-    mifsa_gnss_sample
-    sample.cpp
-    )
-add_executable(
-    mifsa_gnss_sample_c
-    sample.c
-    )
-target_link_libraries(
-    mifsa_gnss_sample
-    PRIVATE
-    mifsa_base
-    mifsa_gnss
-)
-target_link_libraries(
-    mifsa_gnss_sample_c
-    PRIVATE
-    mifsa_base
-    mifsa_gnss
-    mifsa_gnss_c
-)
-install(
-    TARGETS
-    mifsa_gnss_sample
-    mifsa_gnss_sample_c
-    RUNTIME
-    DESTINATION
-    ${CMAKE_INSTALL_BINDIR}
-    ARCHIVE
-    DESTINATION
-    ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY
-    DESTINATION
-    ${CMAKE_INSTALL_LIBDIR}
-    )
+if (TARGET mifsa_${MIFSA_MODULE_TYPE})
+    add_subdirectory(sample)
+endif()
+if (TARGET mifsa_${MIFSA_MODULE_TYPE}_c)
+    add_subdirectory(sample_c)
+endif()

@@ -11,11 +11,11 @@
  **********************************************************************************/
 
 #include "server.h"
-#include "adapter/server_interface_fdbus.hpp"
-#include "adapter/server_interface_ros.hpp"
-#include "adapter/server_interface_vsomeip.hpp"
+#include "adapter/adapter.h"
 #include "parser/minmea.h"
 #include <sstream>
+
+#define m_hpr m_serverHelper
 
 int main(int argc, char* argv[])
 {
@@ -25,52 +25,29 @@ int main(int argc, char* argv[])
 
 MIFSA_NAMESPACE_BEGIN
 
-class EventDemo : public Event {
-public:
-    enum Type {
-        DEMO_1,
-        DEMO_2,
-        DEMO_3
-    };
-    explicit EventDemo(Type type, const Variant& data = Variant())
-        : Event(0, type)
-        , m_data(data)
-    {
-    }
-    inline const Variant& data()
-    {
-        return m_data;
-    }
-    inline void setData(const Variant& data)
-    {
-        m_data = data;
-    }
-
-private:
-    Variant m_data;
+namespace Gnss {
+struct ServerHelper {
+    Location location;
+    const Application::Arg argVersion { "v", "version", " module version" };
 };
 
-namespace Gnss {
-
-const Application::Arg _arg_version("v", "version", " module version");
 Server::Server(int argc, char** argv)
     : ServerProxy(argc, argv, "gnss")
 {
     setInstance(this);
+    MIFSA_HELPER_CREATE(m_hpr);
     //
-    parserArgs({ _arg_version });
-    if (getArgValue(_arg_version).toBool()) {
+    parserArgs({ m_hpr->argVersion });
+    if (getArgValue(m_hpr->argVersion).toBool()) {
         LOG_DEBUG(MIFSA_GNSS_VERSION);
         std::exit(0);
+        return;
     }
     //
     loadPlatform(module());
     loadInterface<ServertInterfaceAdapter>();
-    std::weak_ptr<Timer> timer = createTimer(100, true, [this]() {
+    std::weak_ptr<Timer> timer = createTimer(1000, true, [this]() {
         reportGnss();
-        // test
-        // VariantMap data1 = { { "name", "tuan" }, { "arg", "18" } };
-        // postEvent(std::make_shared<EventDemo>(EventDemo::DEMO_1, data1));
     });
     interface()->setCbNmea([this](std::string& nmea) {
         nmea = platform()->getNmea();
@@ -86,18 +63,19 @@ Server::Server(int argc, char** argv)
 
 Server::~Server()
 {
+    MIFSA_HELPER_DESTROY(m_hpr);
     setInstance(nullptr);
 }
 
 void Server::reportGnss()
 {
     const std::string& nmea = platform()->getNmea();
-    parserNmea(nmea, m_location);
+    parserNmea(nmea, m_hpr->location);
     std::string data;
     data.resize(1024);
     data.append("data");
-    m_location.data = data;
-    interface()->reportGnss(m_location);
+    m_hpr->location.data = data;
+    interface()->reportGnss(m_hpr->location);
 }
 
 void Server::parserNmea(const std::string& nmea, Location& location)
@@ -235,20 +213,6 @@ void Server::eventChanged(const std::shared_ptr<Event>& event)
 {
     if (!event || event->isAccepted()) {
         return;
-    }
-    switch (event->type()) {
-    case EventDemo::DEMO_1: {
-        auto demoEvent = std::dynamic_pointer_cast<EventDemo>(event);
-        if (demoEvent) {
-            // LOG_DEBUG(demoEvent->data());
-        }
-    } break;
-    case EventDemo::DEMO_2: {
-    } break;
-    case EventDemo::DEMO_3: {
-    } break;
-    default:
-        break;
     }
 }
 

@@ -64,7 +64,7 @@ int mifsa_gnss_get_nmea_data(char** nmea, int* size)
     if (!nmea || !size) {
         return 2;
     }
-    std::string data = _gnss_client->getNmea().c_str();
+    std::string data = _gnss_client->interface()->getNmea().c_str();
     memcpy(*nmea, data.c_str(), data.size());
     *size = (int)data.size();
     return 0;
@@ -75,7 +75,7 @@ int mifsa_gnss_start_navigation()
     if (!_gnss_client) {
         return 1;
     }
-    _gnss_client->startNavigation([&](const Location& location) {
+    _gnss_client->interface()->startNavigation([&](const Location& location) {
         if (_cb_tables.location_cb) {
             mifsa_gnss_location_t c_location;
             c_location.size = location.size;
@@ -100,6 +100,6 @@ int mifsa_gnss_stop_navigation()
     if (!_gnss_client) {
         return 1;
     }
-    _gnss_client->stopNavigation();
+    _gnss_client->interface()->stopNavigation();
     return 0;
 }

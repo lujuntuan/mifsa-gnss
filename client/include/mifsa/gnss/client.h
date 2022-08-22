@@ -25,9 +25,6 @@ class MIFSA_EXPORT Client : public ClientProxy<ClientInterface>, public Singleto
 public:
     Client(int argc, char** argv);
     ~Client();
-    virtual std::string getNmea();
-    virtual void startNavigation(const ClientInterface::CbLocation& cb);
-    virtual void stopNavigation();
 
 private:
     friend class ClientInterfaceAdapter;

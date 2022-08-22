@@ -13,7 +13,7 @@
 #ifndef MIFSA_GNSS_CIENT_INTERFACE_H
 #define MIFSA_GNSS_CIENT_INTERFACE_H
 
-#include "common_types.h"
+#include "types/location.h"
 #include <mifsa/module/client.hpp>
 
 MIFSA_NAMESPACE_BEGIN

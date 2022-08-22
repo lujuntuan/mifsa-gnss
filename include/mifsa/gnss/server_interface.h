@@ -13,7 +13,7 @@
 #ifndef MIFSA_GNSS_PROVIDER_H
 #define MIFSA_GNSS_PROVIDER_H
 
-#include "common_types.h"
+#include "types/location.h"
 #include <mifsa/module/server.hpp>
 
 MIFSA_NAMESPACE_BEGIN

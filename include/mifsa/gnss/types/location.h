@@ -10,8 +10,8 @@
  *History:
  **********************************************************************************/
 
-#ifndef MIFSA_GNSS_COMMON_TYPES_H
-#define MIFSA_GNSS_COMMON_TYPES_H
+#ifndef MIFSA_GNSS_TYPES_LOCATION_H
+#define MIFSA_GNSS_TYPES_LOCATION_H
 
 #include "mifsa/gnss/config.h"
 #include <functional>
@@ -37,4 +37,4 @@ struct Location {
 
 MIFSA_NAMESPACE_END
 
-#endif // MIFSA_GNSS_COMMON_TYPES_H
+#endif // MIFSA_GNSS_TYPES_LOCATION_H

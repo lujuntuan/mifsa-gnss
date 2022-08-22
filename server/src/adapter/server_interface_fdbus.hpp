@@ -13,8 +13,6 @@
 #ifndef MIFSA_GNSS_SERVER_INTERFACE_FDBUS_H
 #define MIFSA_GNSS_SERVER_INTERFACE_FDBUS_H
 
-#ifdef MIFSA_SUPPORT_FDBUS
-
 #ifdef WIN32
 #ifndef __WIN32__
 #define __WIN32__
@@ -136,7 +134,5 @@ private:
 }
 
 MIFSA_NAMESPACE_END
-
-#endif
 
 #endif // MIFSA_GNSS_SERVER_INTERFACE_FDBUS_H

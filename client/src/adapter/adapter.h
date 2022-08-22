@@ -10,26 +10,10 @@
  *History:
  **********************************************************************************/
 
-#include "mifsa/gnss/client.h"
-#include "adapter/adapter.h"
-
-MIFSA_NAMESPACE_BEGIN
-
-namespace Gnss {
-
-Client::Client(int argc, char** argv)
-    : ClientProxy(argc, argv, "mifsa_gnss_server")
-{
-    setInstance(this);
-    //
-    loadInterface<ClientInterfaceAdapter>();
-}
-
-Client::~Client()
-{
-    setInstance(nullptr);
-}
-
-}
-
-MIFSA_NAMESPACE_END
+#if defined(MIFSA_SUPPORT_ROS)
+#include "client_interface_ros.hpp"
+#elif defined(MIFSA_SUPPORT_VSOMEIP)
+#include "client_interface_vsomeip.hpp"
+#elif defined(MIFSA_SUPPORT_FDBUS)
+#include "client_interface_fdbus.hpp"
+#endif

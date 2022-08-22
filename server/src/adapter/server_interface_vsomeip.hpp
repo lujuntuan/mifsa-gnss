@@ -13,8 +13,6 @@
 #ifndef MIFSA_GNSS_SERVER_INTERFACE_VSOMEIP_H
 #define MIFSA_GNSS_SERVER_INTERFACE_VSOMEIP_H
 
-#ifdef MIFSA_SUPPORT_VSOMEIP
-
 #include "mifsa/gnss/server_interface.h"
 #include <CommonAPI/CommonAPI.hpp>
 #include <mifsa/utils/dir.h>
@@ -100,7 +98,5 @@ private:
 }
 
 MIFSA_NAMESPACE_END
-
-#endif
 
 #endif // MIFSA_GNSS_SERVER_INTERFACE_VSOMEIP_H
