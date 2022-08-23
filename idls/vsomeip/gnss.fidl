@@ -1,6 +1,6 @@
-package commonapi.mifsa.gnss
+package commonapi
 
-interface interfaces {
+interface mifsa_gnss_idl {
     version { major 1 minor 0 }
     method startNavigation fireAndForget {
     }

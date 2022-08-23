@@ -26,7 +26,9 @@ int mifsa_gnss_init(mifsa_gnss_cb_tables_t cbs)
     }
     _cb_tables = cbs;
     _gnss_client = std::make_shared<Client>(0, nullptr);
-    _gnss_client->setInstance(_gnss_client.get());
+#ifdef WIN32
+    _gnss_client->setInstanceForce(_gnss_client.get());
+#endif
     _gnss_client->detectConnect([](bool connected) {
         if (_cb_tables.connected_cb) {
             _cb_tables.connected_cb(connected);

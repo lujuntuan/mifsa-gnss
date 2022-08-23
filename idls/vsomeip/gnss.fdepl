@@ -1,7 +1,7 @@
 import "platform:/plugin/org.genivi.commonapi.someip/deployment/CommonAPI-SOMEIP_deployment_spec.fdepl"
 import "gnss.fidl"
 
-define org.genivi.commonapi.someip.deployment for interface commonapi.mifsa.gnss.interfaces {
+define org.genivi.commonapi.someip.deployment for interface commonapi.mifsa_gnss_idl {
     SomeIpServiceID = 12201
     method startNavigation {
         SomeIpMethodID = 12510
@@ -31,8 +31,8 @@ define org.genivi.commonapi.someip.deployment for interface commonapi.mifsa.gnss
 }
 
 define org.genivi.commonapi.someip.deployment for provider as Service {
-    instance commonapi.mifsa.gnss.interfaces {
-        InstanceId = "commonapi.mifsa.gnss.interfaces"
+    instance commonapi.mifsa_gnss_idl {
+        InstanceId = "commonapi.mifsa_gnss_idl"
         SomeIpInstanceID = 12101
     }
 }

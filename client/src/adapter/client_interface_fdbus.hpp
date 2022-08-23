@@ -38,6 +38,22 @@ MIFSA_NAMESPACE_BEGIN
 int _time_out = 5000;
 
 namespace Gnss {
+static Location _getLocation(const mifsa_gnss_idl::Location& t_location)
+{
+    Location location;
+    location.size = (int)t_location.size();
+    location.flags = t_location.flags();
+    location.latitude = t_location.latitude();
+    location.longitude = t_location.longitude();
+    location.altitude = t_location.altitude();
+    location.speed = t_location.speed();
+    location.bearing = t_location.bearing();
+    location.accuracy = t_location.accuracy();
+    location.timestamp = t_location.timestamp();
+    location.data = t_location.data();
+    return location;
+}
+
 class ClientInterfaceAdapter : public ClientInterface, protected CBaseClient {
 public:
     ClientInterfaceAdapter()
@@ -53,6 +69,12 @@ public:
         m_worker.exit();
         CBaseClient::disconnect();
     }
+    virtual void onStarted() override
+    {
+    }
+    virtual void onStoped() override
+    {
+    }
     virtual std::string version() override
     {
         return MIFSA_GNSS_VERSION;
@@ -64,13 +86,13 @@ public:
     virtual std::string getNmea() override
     {
         std::string nmea;
-        mifsa::gnss::pb::Command pb_command;
-        pb_command.set_type(mifsa::gnss::pb::Command_Type_QUERY_NMEA);
+        mifsa_gnss_idl::Command pb_command;
+        pb_command.set_type(mifsa_gnss_idl::Command_Type_QUERY_NMEA);
         CFdbProtoMsgBuilder builder(pb_command);
-        CBaseJob::Ptr msg_ref(new CBaseMessage(mifsa::gnss::pb::MSG_COMMAND));
+        CBaseJob::Ptr msg_ref(new CBaseMessage(mifsa_gnss_idl::MSG_COMMAND));
         CBaseClient::invoke(msg_ref, builder, _time_out);
         auto msg = castToMessage<CBaseMessage*>(msg_ref);
-        mifsa::gnss::pb::Nmea pb_nmea;
+        mifsa_gnss_idl::Nmea pb_nmea;
         if (msg->getPayloadSize() > 0) {
             CFdbProtoMsgParser parser(pb_nmea);
             if (!msg->deserialize(parser)) {
@@ -84,24 +106,24 @@ public:
     virtual void startNavigation(const CbLocation& cb) override
     {
         m_cbLocation = cb;
-        mifsa::gnss::pb::Command pb_command;
-        pb_command.set_type(mifsa::gnss::pb::Command_Type_START_NAVIGATION);
+        mifsa_gnss_idl::Command pb_command;
+        pb_command.set_type(mifsa_gnss_idl::Command_Type_START_NAVIGATION);
         CFdbProtoMsgBuilder builder(pb_command);
-        CBaseClient::invoke(mifsa::gnss::pb::MSG_COMMAND, builder, _time_out);
+        CBaseClient::invoke(mifsa_gnss_idl::MSG_COMMAND, builder, _time_out);
     }
     virtual void stopNavigation() override
     {
-        mifsa::gnss::pb::Command pb_command;
-        pb_command.set_type(mifsa::gnss::pb::Command_Type_STOP_NAVIGATION);
+        mifsa_gnss_idl::Command pb_command;
+        pb_command.set_type(mifsa_gnss_idl::Command_Type_STOP_NAVIGATION);
         CFdbProtoMsgBuilder builder(pb_command);
-        CBaseClient::invoke(mifsa::gnss::pb::MSG_COMMAND, builder, _time_out);
+        CBaseClient::invoke(mifsa_gnss_idl::MSG_COMMAND, builder, _time_out);
     }
 
 protected:
     void onOnline(FDBUS_ONLINE_ARG_TYPE) override
     {
         CFdbMsgSubscribeList subList;
-        CBaseClient::addNotifyItem(subList, mifsa::gnss::pb::MSG_LOCATION);
+        CBaseClient::addNotifyItem(subList, mifsa_gnss_idl::MSG_LOCATION);
         CBaseClient::subscribe(subList);
         cbConnected(true);
     }
@@ -112,30 +134,19 @@ protected:
     void onBroadcast(CBaseJob::Ptr& msg_ref) override
     {
         auto msg = castToMessage<CBaseMessage*>(msg_ref);
-        if (msg->code() == mifsa::gnss::pb::MSG_LOCATION) {
+        if (msg->code() == mifsa_gnss_idl::MSG_LOCATION) {
             if (!m_cbLocation) {
                 return;
             }
-            mifsa::gnss::pb::Location pb_location;
+            mifsa_gnss_idl::Location t_location;
             if (msg->getPayloadSize() > 0) {
-                CFdbProtoMsgParser parser(pb_location);
+                CFdbProtoMsgParser parser(t_location);
                 if (!msg->deserialize(parser)) {
                     LOG_WARNING("deserialize msg error");
                     return;
                 }
             }
-            Location location;
-            location.size = (int)pb_location.size();
-            location.flags = pb_location.flags();
-            location.latitude = pb_location.latitude();
-            location.longitude = pb_location.longitude();
-            location.altitude = pb_location.altitude();
-            location.speed = pb_location.speed();
-            location.bearing = pb_location.bearing();
-            location.accuracy = pb_location.accuracy();
-            location.timestamp = pb_location.timestamp();
-            location.data = pb_location.data();
-            m_cbLocation(location);
+            m_cbLocation(_getLocation(t_location));
         }
     }
 

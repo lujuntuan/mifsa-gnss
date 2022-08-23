@@ -21,11 +21,24 @@
 #include <mifsa_gnss_idl/srv/nmea.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-using namespace mifsa_gnss_idl;
-
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
+static mifsa_gnss_idl::msg::Location _getLocation(const Location& location)
+{
+    mifsa_gnss_idl::msg::Location t_location;
+    t_location.size = location.size;
+    t_location.flags = location.flags;
+    t_location.latitude = location.latitude;
+    t_location.longitude = location.longitude;
+    t_location.altitude = location.altitude;
+    t_location.speed = location.speed;
+    t_location.bearing = location.bearing;
+    t_location.accuracy = location.accuracy;
+    t_location.timestamp = location.timestamp;
+    t_location.data = location.data;
+    return t_location;
+}
 
 class ServertInterfaceAdapter : public ServerInterface {
 public:
@@ -37,21 +50,21 @@ public:
             m_node = rclcpp::Node::make_shared("mifsa_gnss_server");
             m_callbackGroup = m_node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
             auto qosConfig = rclcpp::QoS(rclcpp::KeepLast(10)).reliable();
-            m_locationPub = m_node->create_publisher<msg::Location>("/mifsa/gnss/location", qosConfig);
-            m_commandSub = m_node->create_subscription<msg::Command>("/mifsa/gnss/command", qosConfig, [this](msg::Command::UniquePtr ros_command) {
-                if (ros_command->type == msg::Command::START_NAVIGATION) {
+            m_locationPub = m_node->create_publisher<mifsa_gnss_idl::msg::Location>("/mifsa/gnss/location", qosConfig);
+            m_commandSub = m_node->create_subscription<mifsa_gnss_idl::msg::Command>("/mifsa/gnss/command", qosConfig, [this](mifsa_gnss_idl::msg::Command::UniquePtr ros_command) {
+                if (ros_command->type == mifsa_gnss_idl::msg::Command::START_NAVIGATION) {
                     if (cbStartNavigation) {
                         cbStartNavigation();
                     }
-                } else if (ros_command->type == msg::Command::STOP_NAVIGATION) {
+                } else if (ros_command->type == mifsa_gnss_idl::msg::Command::STOP_NAVIGATION) {
                     if (cbStopNavigation) {
                         cbStopNavigation();
                     }
                 }
             });
-            m_nmeaService = m_node->create_service<srv::Nmea>(
-                "mifsa_gnss_server_nmea", [this](const std::shared_ptr<srv::Nmea::Request> request, std::shared_ptr<srv::Nmea::Response> response) {
-                    if (request->type == srv::Nmea::Request::QUERY_NMEA) {
+            m_nmeaService = m_node->create_service<mifsa_gnss_idl::srv::Nmea>(
+                "mifsa_gnss_server_nmea", [this](const std::shared_ptr<mifsa_gnss_idl::srv::Nmea::Request> request, std::shared_ptr<mifsa_gnss_idl::srv::Nmea::Response> response) {
+                    if (request->type == mifsa_gnss_idl::srv::Nmea::Request::QUERY_NMEA) {
                         std::string nmea;
                         if (cbNmea) {
                             cbNmea(nmea);
@@ -74,24 +87,19 @@ public:
         rclcpp::shutdown();
         m_thread.stop();
     }
+    virtual void onStarted() override
+    {
+    }
+    virtual void onStoped() override
+    {
+    }
     virtual void setCbNmea(const CbNmea& cb) override
     {
         cbNmea = cb;
     }
     virtual void reportGnss(const Location& location) override
     {
-        msg::Location ros_location;
-        ros_location.size = location.size;
-        ros_location.flags = location.flags;
-        ros_location.latitude = location.latitude;
-        ros_location.longitude = location.longitude;
-        ros_location.altitude = location.altitude;
-        ros_location.speed = location.speed;
-        ros_location.bearing = location.bearing;
-        ros_location.accuracy = location.accuracy;
-        ros_location.timestamp = location.timestamp;
-        ros_location.data = location.data;
-        m_locationPub->publish(ros_location);
+        m_locationPub->publish(_getLocation(location));
     }
     virtual void setCbStartNavigation(const CbStartNavigation& cb) override
     {
@@ -106,9 +114,9 @@ private:
     Thread m_thread;
     rclcpp::Node::SharedPtr m_node;
     rclcpp::CallbackGroup::SharedPtr m_callbackGroup;
-    rclcpp::Publisher<msg::Location>::SharedPtr m_locationPub;
-    rclcpp::Subscription<msg::Command>::SharedPtr m_commandSub;
-    rclcpp::Service<srv::Nmea>::SharedPtr m_nmeaService;
+    rclcpp::Publisher<mifsa_gnss_idl::msg::Location>::SharedPtr m_locationPub;
+    rclcpp::Subscription<mifsa_gnss_idl::msg::Command>::SharedPtr m_commandSub;
+    rclcpp::Service<mifsa_gnss_idl::srv::Nmea>::SharedPtr m_nmeaService;
     //
     CbNmea cbNmea;
     CbStartNavigation cbStartNavigation;

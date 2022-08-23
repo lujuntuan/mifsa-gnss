@@ -37,6 +37,22 @@ using namespace ipc::fdbus;
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
+static mifsa_gnss_idl::Location _getLocation(const Location& location)
+{
+    mifsa_gnss_idl::Location t_location;
+    t_location.set_size(location.size);
+    t_location.set_flags(location.flags);
+    t_location.set_latitude(location.latitude);
+    t_location.set_longitude(location.longitude);
+    t_location.set_altitude(location.altitude);
+    t_location.set_speed(location.speed);
+    t_location.set_bearing(location.bearing);
+    t_location.set_accuracy(location.accuracy);
+    t_location.set_timestamp(location.timestamp);
+    t_location.set_data(location.data);
+    return t_location;
+}
+
 class ServertInterfaceAdapter : public ServerInterface, public CBaseServer {
 public:
     ServertInterfaceAdapter()
@@ -53,25 +69,20 @@ public:
         CBaseServer::unbind();
         CBaseServer::disconnect();
     }
+    virtual void onStarted() override
+    {
+    }
+    virtual void onStoped() override
+    {
+    }
     virtual void setCbNmea(const CbNmea& cb) override
     {
         m_cbNmea = cb;
     }
     virtual void reportGnss(const Location& location) override
     {
-        mifsa::gnss::pb::Location pb_location;
-        pb_location.set_size(location.size);
-        pb_location.set_flags(location.flags);
-        pb_location.set_latitude(location.latitude);
-        pb_location.set_longitude(location.longitude);
-        pb_location.set_altitude(location.altitude);
-        pb_location.set_speed(location.speed);
-        pb_location.set_bearing(location.bearing);
-        pb_location.set_accuracy(location.accuracy);
-        pb_location.set_timestamp(location.timestamp);
-        pb_location.set_data(location.data);
-        CFdbProtoMsgBuilder builder(pb_location);
-        CBaseServer::broadcast(mifsa::gnss::pb::MSG_LOCATION, builder);
+        CFdbProtoMsgBuilder builder(_getLocation(location));
+        CBaseServer::broadcast(mifsa_gnss_idl::MSG_LOCATION, builder);
     }
     virtual void setCbStartNavigation(const CbStartNavigation& cb) override
     {
@@ -95,8 +106,8 @@ protected:
     void onInvoke(CBaseJob::Ptr& msg_ref) override
     {
         auto msg = castToMessage<CBaseMessage*>(msg_ref);
-        if (msg->code() == mifsa::gnss::pb::MSG_COMMAND) {
-            mifsa::gnss::pb::Command pb_command;
+        if (msg->code() == mifsa_gnss_idl::MSG_COMMAND) {
+            mifsa_gnss_idl::Command pb_command;
             if (msg->getPayloadSize() > 0) {
                 CFdbProtoMsgParser parser(pb_command);
                 if (!msg->deserialize(parser)) {
@@ -104,20 +115,20 @@ protected:
                     return;
                 }
             }
-            if (pb_command.type() == mifsa::gnss::pb::Command_Type_QUERY_NMEA) {
+            if (pb_command.type() == mifsa_gnss_idl::Command_Type_QUERY_NMEA) {
                 std::string nmea;
                 if (m_cbNmea) {
                     m_cbNmea(nmea);
                 }
-                mifsa::gnss::pb::Nmea pb_nmea;
+                mifsa_gnss_idl::Nmea pb_nmea;
                 pb_nmea.set_data(nmea);
                 CFdbProtoMsgBuilder builder(pb_nmea);
                 msg->reply(msg_ref, builder);
-            } else if (pb_command.type() == mifsa::gnss::pb::Command_Type_START_NAVIGATION) {
+            } else if (pb_command.type() == mifsa_gnss_idl::Command_Type_START_NAVIGATION) {
                 if (m_cbStartNavigation) {
                     m_cbStartNavigation();
                 }
-            } else if (pb_command.type() == mifsa::gnss::pb::Command_Type_STOP_NAVIGATION) {
+            } else if (pb_command.type() == mifsa_gnss_idl::Command_Type_STOP_NAVIGATION) {
                 if (m_cbStopNavigation) {
                     m_cbStopNavigation();
                 }

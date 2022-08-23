@@ -1,5 +1,5 @@
 syntax = "proto3";
-package mifsa.gnss.pb;
+package mifsa_gnss_idl;
 
 enum MsgID {
     MSG_UNKNOWN = 0;

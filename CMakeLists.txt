@@ -40,6 +40,9 @@ add_custom_target(
     ${PROJECT_HEADERS}
 )
 
+mifsa_install_etc(mifsa_${MIFSA_MODULE_TYPE}_root_etc ${PROJECT_SOURCE_DIR})
+mifsa_install_share(mifsa_${MIFSA_MODULE_TYPE}_root_share ${PROJECT_SOURCE_DIR})
+
 option(MIFSA_GNSS_BUILD_SERVER "Build gnss server" ON)
 option(MIFSA_GNSS_BUILD_CLIENT "Build gnss client" ON)
 add_subdirectory(idls)

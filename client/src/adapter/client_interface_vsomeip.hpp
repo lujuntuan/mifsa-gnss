@@ -17,15 +17,30 @@
 #include <CommonAPI/CommonAPI.hpp>
 #include <mifsa/utils/dir.h>
 #include <mifsa/utils/host.h>
-#include <v1/commonapi/mifsa/gnss/interfacesProxy.hpp>
+#include <v1/commonapi/mifsa_gnss_idlProxy.hpp>
 
-using namespace v1_0::commonapi::mifsa::gnss;
+using namespace v1_0::commonapi;
 
 MIFSA_NAMESPACE_BEGIN
 
 CommonAPI::CallInfo _callInfo(5000);
 
 namespace Gnss {
+static Location _getLocation(const mifsa_gnss_idl::Location& t_location)
+{
+    Location location;
+    location.size = t_location.getSize();
+    location.flags = t_location.getFlags();
+    location.latitude = t_location.getLatitude();
+    location.longitude = t_location.getLongitude();
+    location.altitude = t_location.getAltitude();
+    location.speed = t_location.getSpeed();
+    location.bearing = t_location.getBearing();
+    location.accuracy = t_location.getAccuracy();
+    location.timestamp = t_location.getTimestamp();
+    location.data = t_location.getData();
+    return location;
+}
 
 class ClientInterfaceAdapter : public ClientInterface {
 public:
@@ -35,7 +50,7 @@ public:
         if (!vsomeipApiCfg.empty()) {
             Utils::setEnvironment("VSOMEIP_CONFIGURATION", vsomeipApiCfg);
         }
-        m_commonApiProxy = CommonAPI::Runtime::get()->buildProxy<interfacesProxy>("local", "commonapi.mifsa.gnss.interfaces", "mifsa_gnss_client");
+        m_commonApiProxy = CommonAPI::Runtime::get()->buildProxy<mifsa_gnss_idlProxy>("local", "commonapi.mifsa.gnss.interfaces", "mifsa_gnss_client");
         m_commonApiProxy->getProxyStatusEvent().subscribe([this](const CommonAPI::AvailabilityStatus& status) {
             if (status == CommonAPI::AvailabilityStatus::AVAILABLE) {
                 cbConnected(true);
@@ -43,29 +58,22 @@ public:
                 cbConnected(false);
             }
         });
-        m_commonApiProxy->getReportLocationEvent().subscribe([this](const interfaces::Location& capi_location) {
+        m_commonApiProxy->getReportLocationEvent().subscribe([this](const mifsa_gnss_idl::Location& t_location) {
             if (cbLocation) {
-                Location location;
-                location.size = capi_location.getSize();
-                location.flags = capi_location.getFlags();
-                location.latitude = capi_location.getLatitude();
-                location.longitude = capi_location.getLongitude();
-                location.altitude = capi_location.getAltitude();
-                location.speed = capi_location.getSpeed();
-                location.bearing = capi_location.getBearing();
-                location.accuracy = capi_location.getAccuracy();
-                location.timestamp = capi_location.getTimestamp();
-                location.data = capi_location.getData();
-                cbLocation(location);
+                cbLocation(_getLocation(t_location));
             }
         });
-        {
-        }
     }
     ~ClientInterfaceAdapter()
     {
         m_commonApiProxy.reset();
         CommonAPI::Runtime::get().reset();
+    }
+    virtual void onStarted() override
+    {
+    }
+    virtual void onStoped() override
+    {
     }
     virtual std::string version() override
     {
@@ -78,7 +86,7 @@ public:
     virtual std::string getNmea() override
     {
         CommonAPI::CallStatus status;
-        interfaces::Nmea nmea;
+        mifsa_gnss_idl::Nmea nmea;
         m_commonApiProxy->getNmea(status, nmea, &_callInfo);
         if (status != CommonAPI::CallStatus::SUCCESS) {
             LOG_WARNING("invoke failed, error code=", (int)status);
@@ -104,7 +112,7 @@ public:
     }
 
 private:
-    std::shared_ptr<interfacesProxy<>> m_commonApiProxy;
+    std::shared_ptr<mifsa_gnss_idlProxy<>> m_commonApiProxy;
     CbLocation cbLocation;
 };
 
