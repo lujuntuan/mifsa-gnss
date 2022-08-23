@@ -81,7 +81,8 @@ public:
     }
     virtual void reportGnss(const Location& location) override
     {
-        CFdbProtoMsgBuilder builder(_getLocation(location));
+        const auto& t_location = _getLocation(location);
+        CFdbProtoMsgBuilder builder(t_location);
         CBaseServer::broadcast(mifsa_gnss_idl::MSG_LOCATION, builder);
     }
     virtual void setCbStartNavigation(const CbStartNavigation& cb) override

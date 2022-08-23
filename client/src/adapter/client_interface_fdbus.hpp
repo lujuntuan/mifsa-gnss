@@ -113,6 +113,9 @@ public:
     }
     virtual void stopNavigation() override
     {
+        if (!m_cbLocation) {
+            return;
+        }
         mifsa_gnss_idl::Command pb_command;
         pb_command.set_type(mifsa_gnss_idl::Command_Type_STOP_NAVIGATION);
         CFdbProtoMsgBuilder builder(pb_command);
@@ -146,7 +149,8 @@ protected:
                     return;
                 }
             }
-            m_cbLocation(_getLocation(t_location));
+            const auto& location = _getLocation(t_location);
+            m_cbLocation(location);
         }
     }
 

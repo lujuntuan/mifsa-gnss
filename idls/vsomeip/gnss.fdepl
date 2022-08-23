@@ -1,8 +1,8 @@
 import "platform:/plugin/org.genivi.commonapi.someip/deployment/CommonAPI-SOMEIP_deployment_spec.fdepl"
 import "gnss.fidl"
 
-define org.genivi.commonapi.someip.deployment for interface commonapi.mifsa_gnss_idl {
-    SomeIpServiceID = 12201
+define org.genivi.commonapi.someip.deployment for interface mifsa_gnss_idl.Common {
+    SomeIpServiceID = 12101
     method startNavigation {
         SomeIpMethodID = 12510
         SomeIpReliable = true
@@ -22,17 +22,17 @@ define org.genivi.commonapi.someip.deployment for interface commonapi.mifsa_gnss
         }
     }
     broadcast reportLocation {
-        SomeIpEventID = 12620
+        SomeIpEventID = 52620
         SomeIpReliable = true
-        SomeIpEventGroups = { 12620 }
+        SomeIpEventGroups = { 52620 }
         out {
         }
     }
 }
 
 define org.genivi.commonapi.someip.deployment for provider as Service {
-    instance commonapi.mifsa_gnss_idl {
-        InstanceId = "commonapi.mifsa_gnss_idl"
-        SomeIpInstanceID = 12101
+    instance mifsa_gnss_idl.Common {
+        InstanceId = "mifsa_gnss_idl.Common"
+        SomeIpInstanceID = 12201
     }
 }

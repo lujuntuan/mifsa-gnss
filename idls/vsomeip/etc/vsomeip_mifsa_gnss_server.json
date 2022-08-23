@@ -24,7 +24,7 @@
             "events" :
             [
                 {
-                    "event" : "12620",
+                    "event" : "52620",
                     "is_field" : "false",
                     "is_reliable" : "true"
                 }
@@ -32,8 +32,8 @@
             "eventgroups" :
             [
                 {
-                    "eventgroup" : "12620",
-                    "events" : [ "12620" ]
+                    "eventgroup" : "52620",
+                    "events" : [ "52620" ]
                 }
             ]
         }

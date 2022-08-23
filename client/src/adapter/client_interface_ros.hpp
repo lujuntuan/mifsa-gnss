@@ -52,8 +52,9 @@ public:
             m_callbackGroup = m_node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
             auto qosConfig = rclcpp::QoS(rclcpp::KeepLast(10)).reliable();
             m_locationSub = m_node->create_subscription<mifsa_gnss_idl::msg::Location>("/mifsa/gnss/location", qosConfig, [this](mifsa_gnss_idl::msg::Location::UniquePtr t_location) {
-                if (cbLocation) {
-                    cbLocation(_getLocation(t_location));
+                if (m_cbLocation) {
+                    const auto& location = _getLocation(t_location);
+                    m_cbLocation(location);
                 }
             });
             m_commandPub = m_node->create_publisher<mifsa_gnss_idl::msg::Command>("/mifsa/gnss/command", qosConfig);
@@ -110,13 +111,16 @@ public:
     }
     virtual void startNavigation(const CbLocation& cb) override
     {
-        cbLocation = cb;
+        m_cbLocation = cb;
         mifsa_gnss_idl::msg::Command ros_command;
         ros_command.type = mifsa_gnss_idl::msg::Command::START_NAVIGATION;
         m_commandPub->publish(ros_command);
     }
     virtual void stopNavigation() override
     {
+        if (!m_cbLocation) {
+            return;
+        }
         mifsa_gnss_idl::msg::Command ros_command;
         ros_command.type = mifsa_gnss_idl::msg::Command::STOP_NAVIGATION;
         m_commandPub->publish(ros_command);
@@ -132,7 +136,7 @@ private:
     rclcpp::TimerBase::SharedPtr m_timer;
     bool m_connected = false;
     //
-    CbLocation cbLocation;
+    CbLocation m_cbLocation;
 };
 
 }

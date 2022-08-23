@@ -17,16 +17,16 @@
 #include <CommonAPI/CommonAPI.hpp>
 #include <mifsa/utils/dir.h>
 #include <mifsa/utils/host.h>
-#include <v1/commonapi/mifsa_gnss_idlStubDefault.hpp>
+#include <v1/mifsa_gnss_idl/CommonStubDefault.hpp>
 
-using namespace v1_0::commonapi;
+using namespace v1_0;
 
 MIFSA_NAMESPACE_BEGIN
 
 namespace Gnss {
-static mifsa_gnss_idl::Location _getLocation(const Location& location)
+static mifsa_gnss_idl::Common::Location _getLocation(const Location& location)
 {
-    mifsa_gnss_idl::Location t_location;
+    mifsa_gnss_idl::Common::Location t_location;
     t_location.setSize(location.size);
     t_location.setFlags(location.flags);
     t_location.setLatitude(location.latitude);
@@ -40,7 +40,7 @@ static mifsa_gnss_idl::Location _getLocation(const Location& location)
     return t_location;
 }
 
-class ServertInterfaceAdapter : public ServerInterface, protected mifsa_gnss_idlStubDefault {
+class ServertInterfaceAdapter : public ServerInterface, protected mifsa_gnss_idl::CommonStubDefault {
 public:
     ServertInterfaceAdapter()
     {
@@ -48,8 +48,8 @@ public:
         if (!vsomeipApiCfg.empty()) {
             Utils::setEnvironment("VSOMEIP_CONFIGURATION", vsomeipApiCfg);
         }
-        std::shared_ptr<mifsa_gnss_idlStubDefault> ptr = std::shared_ptr<mifsa_gnss_idlStubDefault>((mifsa_gnss_idlStubDefault*)this);
-        CommonAPI::Runtime::get()->registerService("local", "commonapi.mifsa.gnss.interfaces", ptr, "mifsa_gnss_server");
+        std::shared_ptr<mifsa_gnss_idl::CommonStubDefault> ptr = std::shared_ptr<mifsa_gnss_idl::CommonStubDefault>((mifsa_gnss_idl::CommonStubDefault*)this);
+        CommonAPI::Runtime::get()->registerService("local", "mifsa_gnss_idl.Common", ptr, "mifsa_gnss_server");
     }
     ~ServertInterfaceAdapter()
     {
@@ -67,7 +67,8 @@ public:
     }
     virtual void reportGnss(const Location& location) override
     {
-        mifsa_gnss_idlStubDefault::fireReportLocationEvent(_getLocation(location));
+        const auto& t_location = _getLocation(location);
+        mifsa_gnss_idl::CommonStubDefault::fireReportLocationEvent(t_location);
     }
     virtual void setCbStartNavigation(const CbStartNavigation& cb) override
     {

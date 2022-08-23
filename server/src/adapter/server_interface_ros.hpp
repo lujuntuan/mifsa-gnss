@@ -53,12 +53,12 @@ public:
             m_locationPub = m_node->create_publisher<mifsa_gnss_idl::msg::Location>("/mifsa/gnss/location", qosConfig);
             m_commandSub = m_node->create_subscription<mifsa_gnss_idl::msg::Command>("/mifsa/gnss/command", qosConfig, [this](mifsa_gnss_idl::msg::Command::UniquePtr ros_command) {
                 if (ros_command->type == mifsa_gnss_idl::msg::Command::START_NAVIGATION) {
-                    if (cbStartNavigation) {
-                        cbStartNavigation();
+                    if (m_cbStartNavigation) {
+                        m_cbStartNavigation();
                     }
                 } else if (ros_command->type == mifsa_gnss_idl::msg::Command::STOP_NAVIGATION) {
-                    if (cbStopNavigation) {
-                        cbStopNavigation();
+                    if (m_cbStopNavigation) {
+                        m_cbStopNavigation();
                     }
                 }
             });
@@ -66,8 +66,8 @@ public:
                 "mifsa_gnss_server_nmea", [this](const std::shared_ptr<mifsa_gnss_idl::srv::Nmea::Request> request, std::shared_ptr<mifsa_gnss_idl::srv::Nmea::Response> response) {
                     if (request->type == mifsa_gnss_idl::srv::Nmea::Request::QUERY_NMEA) {
                         std::string nmea;
-                        if (cbNmea) {
-                            cbNmea(nmea);
+                        if (m_cbNmea) {
+                            m_cbNmea(nmea);
                         }
                         response->data = nmea;
                     } else {
@@ -95,19 +95,20 @@ public:
     }
     virtual void setCbNmea(const CbNmea& cb) override
     {
-        cbNmea = cb;
+        m_cbNmea = cb;
     }
     virtual void reportGnss(const Location& location) override
     {
-        m_locationPub->publish(_getLocation(location));
+        const auto& t_location = _getLocation(location);
+        m_locationPub->publish(t_location);
     }
     virtual void setCbStartNavigation(const CbStartNavigation& cb) override
     {
-        cbStartNavigation = cb;
+        m_cbStartNavigation = cb;
     }
     virtual void setCbStopNavigation(const CbStopNavigation& cb) override
     {
-        cbStopNavigation = cb;
+        m_cbStopNavigation = cb;
     }
 
 private:
@@ -118,9 +119,9 @@ private:
     rclcpp::Subscription<mifsa_gnss_idl::msg::Command>::SharedPtr m_commandSub;
     rclcpp::Service<mifsa_gnss_idl::srv::Nmea>::SharedPtr m_nmeaService;
     //
-    CbNmea cbNmea;
-    CbStartNavigation cbStartNavigation;
-    CbStopNavigation cbStopNavigation;
+    CbNmea m_cbNmea;
+    CbStartNavigation m_cbStartNavigation;
+    CbStopNavigation m_cbStopNavigation;
 };
 
 }

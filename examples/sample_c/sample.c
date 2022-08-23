@@ -11,9 +11,9 @@
  **********************************************************************************/
 
 #include <inttypes.h>
+#include <mifsa/gnss/client_c.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <mifsa/gnss/client_c.h>
 
 #ifdef WIN32
 #include <Windows.h>

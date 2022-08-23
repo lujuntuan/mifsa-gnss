@@ -17,16 +17,16 @@
 #include <CommonAPI/CommonAPI.hpp>
 #include <mifsa/utils/dir.h>
 #include <mifsa/utils/host.h>
-#include <v1/commonapi/mifsa_gnss_idlProxy.hpp>
+#include <v1/mifsa_gnss_idl/CommonProxy.hpp>
 
-using namespace v1_0::commonapi;
+using namespace v1_0;
 
 MIFSA_NAMESPACE_BEGIN
 
 CommonAPI::CallInfo _callInfo(5000);
 
 namespace Gnss {
-static Location _getLocation(const mifsa_gnss_idl::Location& t_location)
+static Location _getLocation(const mifsa_gnss_idl::Common::Location& t_location)
 {
     Location location;
     location.size = t_location.getSize();
@@ -50,7 +50,7 @@ public:
         if (!vsomeipApiCfg.empty()) {
             Utils::setEnvironment("VSOMEIP_CONFIGURATION", vsomeipApiCfg);
         }
-        m_commonApiProxy = CommonAPI::Runtime::get()->buildProxy<mifsa_gnss_idlProxy>("local", "commonapi.mifsa.gnss.interfaces", "mifsa_gnss_client");
+        m_commonApiProxy = CommonAPI::Runtime::get()->buildProxy<mifsa_gnss_idl::CommonProxy>("local", "mifsa_gnss_idl.Common", "mifsa_gnss_client");
         m_commonApiProxy->getProxyStatusEvent().subscribe([this](const CommonAPI::AvailabilityStatus& status) {
             if (status == CommonAPI::AvailabilityStatus::AVAILABLE) {
                 cbConnected(true);
@@ -58,9 +58,10 @@ public:
                 cbConnected(false);
             }
         });
-        m_commonApiProxy->getReportLocationEvent().subscribe([this](const mifsa_gnss_idl::Location& t_location) {
-            if (cbLocation) {
-                cbLocation(_getLocation(t_location));
+        m_commonApiProxy->getReportLocationEvent().subscribe([this](const mifsa_gnss_idl::Common::Location& t_location) {
+            if (m_cbLocation) {
+                const auto& location = _getLocation(t_location);
+                m_cbLocation(location);
             }
         });
     }
@@ -86,34 +87,28 @@ public:
     virtual std::string getNmea() override
     {
         CommonAPI::CallStatus status;
-        mifsa_gnss_idl::Nmea nmea;
+        mifsa_gnss_idl::Common::Nmea nmea;
         m_commonApiProxy->getNmea(status, nmea, &_callInfo);
-        if (status != CommonAPI::CallStatus::SUCCESS) {
-            LOG_WARNING("invoke failed, error code=", (int)status);
-        }
         return nmea.getData();
     }
     virtual void startNavigation(const CbLocation& cb) override
     {
-        cbLocation = cb;
+        m_cbLocation = cb;
         CommonAPI::CallStatus status;
         m_commonApiProxy->startNavigation(status);
-        if (status != CommonAPI::CallStatus::SUCCESS) {
-            LOG_WARNING("invoke failed, error code=", (int)status);
-        }
     }
     virtual void stopNavigation() override
     {
+        if (!m_cbLocation) {
+            return;
+        }
         CommonAPI::CallStatus status;
         m_commonApiProxy->stopNavigation(status);
-        if (status != CommonAPI::CallStatus::SUCCESS) {
-            LOG_WARNING("invoke failed, error code=", (int)status);
-        }
     }
 
 private:
-    std::shared_ptr<mifsa_gnss_idlProxy<>> m_commonApiProxy;
-    CbLocation cbLocation;
+    std::shared_ptr<mifsa_gnss_idl::CommonProxy<>> m_commonApiProxy;
+    CbLocation m_cbLocation;
 };
 
 }
