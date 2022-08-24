@@ -13,7 +13,7 @@
 #ifndef MIFSA_GNSS_CLIENT_C_H
 #define MIFSA_GNSS_CLIENT_C_H
 
-#include "types_c.h"
+#include "types/location_c.h"
 #include <mifsa/base/define.h>
 
 C_INTERFACE_BEGIN

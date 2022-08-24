@@ -10,12 +10,12 @@
  *History:
  **********************************************************************************/
 
-#ifndef MIFSA_GNSS_TYPES_C_H
-#define MIFSA_GNSS_TYPES_C_H
+#ifndef MIFSA_GNSS_TYPES_LOCATION_C_H
+#define MIFSA_GNSS_TYPES_LOCATION_C_H
 
+#include <mifsa/base/define.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <mifsa/base/define.h>
 
 C_INTERFACE_BEGIN
 
@@ -43,4 +43,4 @@ typedef struct mifsa_gnss_cb_tables {
 
 C_INTERFACE_END
 
-#endif // MIFSA_GNSS_TYPES_C_H
+#endif // MIFSA_GNSS_TYPES_LOCATION_C_H
