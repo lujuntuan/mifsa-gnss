@@ -13,8 +13,6 @@
 #ifndef MIFSA_GNSS_TYPES_LOCATION_H
 #define MIFSA_GNSS_TYPES_LOCATION_H
 
-#include "mifsa/gnss/config.h"
-#include <functional>
 #include <mifsa/base/define.h>
 #include <string>
 

@@ -90,7 +90,7 @@ int mifsa_gnss_start_navigation()
             c_location.accuracy = location.accuracy;
             c_location.timestamp = location.timestamp;
             c_location.data = (char*)location.data.c_str();
-            c_location.data_len = location.data.size();
+            c_location.data_len = (int)location.data.size();
             _cb_tables.location_cb(&c_location);
         }
     });
